@@ -1,4 +1,4 @@
-import 'package:bizkoala_mobileapp/pages/my_quotations.dart';
+import 'package:bizkoala_mobileapp/routes.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:provider/single_child_widget.dart';
@@ -14,13 +14,11 @@ class MyApp extends StatelessWidget {
       child: MaterialApp(
         title: pageTitle,
         theme: ThemeData(primarySwatch: Colors.green),
-        home: MyQuotations(
-          title: 'My Quotations',
-        ),
+        routes: routes,
       ),
       providers: <SingleChildWidget>[
         ChangeNotifierProvider.value(
-          value: new DrawerStateInfo(),
+          value: DrawerStateInfo(),
         )
       ],
     );

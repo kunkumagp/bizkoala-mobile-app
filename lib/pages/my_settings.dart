@@ -1,5 +1,8 @@
 import 'package:bizkoala_mobileapp/component/drawer.dart';
 import 'package:flutter/material.dart';
+import 'package:bizkoala_mobileapp/service/app_services.dart';
+
+final appService = AppService();
 
 class Settings extends StatefulWidget {
   Settings({Key key, this.title}) : super(key: key);
@@ -22,7 +25,11 @@ class _SettingState extends State<Settings> {
               shape: new RoundedRectangleBorder(
                   borderRadius: new BorderRadius.circular(5.0),
                   side: BorderSide(color: Colors.white)),
-              onPressed: () {},
+              onPressed: () {
+                appService.isLoggedIn().then((value) {
+                  print(value);
+                });
+              },
               color: Colors.white,
               textColor: Colors.green,
               child: Text("done".toUpperCase(), style: TextStyle(fontSize: 14)),

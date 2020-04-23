@@ -5,6 +5,9 @@ import 'package:bizkoala_mobileapp/pages/my_product_services.dart';
 import 'package:bizkoala_mobileapp/pages/my_settings.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:bizkoala_mobileapp/service/app_services.dart';
+
+final appService = AppService();
 
 class MyDrawer extends StatelessWidget {
   MyDrawer(this.currentPage);
@@ -96,6 +99,19 @@ class MyDrawer extends StatelessWidget {
                   builder: (BuildContext context) => Settings(
                         title: 'Settings',
                       )));
+            },
+          ),
+          ListTile(
+            title: Text(
+              "Logout",
+              style: currentDrawer == 4
+                  ? TextStyle(fontWeight: FontWeight.bold)
+                  : TextStyle(fontWeight: FontWeight.normal),
+            ),
+            leading: Icon(Icons.exit_to_app),
+            onTap: () {
+              appService.logout();
+              Navigator.pushNamed(context, '/');
             },
           ),
         ],

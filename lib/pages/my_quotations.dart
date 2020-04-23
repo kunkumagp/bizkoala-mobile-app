@@ -1,5 +1,8 @@
 import 'package:bizkoala_mobileapp/component/drawer.dart';
 import 'package:flutter/material.dart';
+import 'package:bizkoala_mobileapp/service/app_services.dart';
+
+final appService = AppService();
 
 class MyQuotations extends StatefulWidget {
   MyQuotations({Key key, this.title}) : super(key: key);
@@ -13,7 +16,7 @@ class _MyQuotationsState extends State<MyQuotations> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.title),
+        title: Text(widget.title == null ? '' : widget.title),
         actions: <Widget>[
           IconButton(icon: Icon(Icons.person), onPressed: () {})
         ],
@@ -53,7 +56,6 @@ Widget _myListView(BuildContext context) {
 
   quotationList.sort((b, a) => a.compareTo(b));
   quotationList.addAll({'test'});
-  print(quotationList);
 
   return ListView.builder(
     itemCount: quotationList.length,
