@@ -1,7 +1,7 @@
 import 'package:bizkoala_mobileapp/main.dart';
-import 'package:bizkoala_mobileapp/pages/my_profile.dart';
-import 'package:bizkoala_mobileapp/pages/my_quotations.dart';
-import 'package:bizkoala_mobileapp/pages/my_product_services.dart';
+import 'package:bizkoala_mobileapp/pages/profile/my_profile.dart';
+import 'package:bizkoala_mobileapp/pages/quotations/my_quotations.dart';
+import 'package:bizkoala_mobileapp/pages/products_services/my_product_services.dart';
 import 'package:bizkoala_mobileapp/pages/my_settings.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -20,8 +20,28 @@ class MyDrawer extends StatelessWidget {
         children: <Widget>[
           ListTile(
             title: Text(
-              'Customers',
+              'Quotations',
               style: currentDrawer == 0
+                  ? TextStyle(fontWeight: FontWeight.bold)
+                  : TextStyle(fontWeight: FontWeight.normal),
+            ),
+            leading: Icon(Icons.description),
+            onTap: () {
+              Navigator.of(context).pop();
+              if (this.currentPage == "Quotations") return;
+              Provider.of<DrawerStateInfo>(context, listen: false)
+                  .setCurrentDrawer(0);
+
+              Navigator.of(context).pushReplacement(MaterialPageRoute(
+                  builder: (BuildContext context) => MyQuotations(
+                        title: 'Quotations',
+                      )));
+            },
+          ),
+          ListTile(
+            title: Text(
+              'Customers',
+              style: currentDrawer == 1
                   ? TextStyle(fontWeight: FontWeight.bold)
                   : TextStyle(fontWeight: FontWeight.normal),
             ),
@@ -41,7 +61,7 @@ class MyDrawer extends StatelessWidget {
           ListTile(
             title: Text(
               "Product & Services",
-              style: currentDrawer == 1
+              style: currentDrawer == 2
                   ? TextStyle(fontWeight: FontWeight.bold)
                   : TextStyle(fontWeight: FontWeight.normal),
             ),
@@ -62,7 +82,7 @@ class MyDrawer extends StatelessWidget {
           ListTile(
             title: Text(
               "Profile",
-              style: currentDrawer == 2
+              style: currentDrawer == 3
                   ? TextStyle(fontWeight: FontWeight.bold)
                   : TextStyle(fontWeight: FontWeight.normal),
             ),
@@ -83,7 +103,7 @@ class MyDrawer extends StatelessWidget {
           ListTile(
             title: Text(
               "Settings",
-              style: currentDrawer == 3
+              style: currentDrawer == 4
                   ? TextStyle(fontWeight: FontWeight.bold)
                   : TextStyle(fontWeight: FontWeight.normal),
             ),
@@ -104,7 +124,7 @@ class MyDrawer extends StatelessWidget {
           ListTile(
             title: Text(
               "Logout",
-              style: currentDrawer == 4
+              style: currentDrawer == 5
                   ? TextStyle(fontWeight: FontWeight.bold)
                   : TextStyle(fontWeight: FontWeight.normal),
             ),
