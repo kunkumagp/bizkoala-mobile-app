@@ -1,8 +1,8 @@
 import 'package:bizkoala_mobileapp/component/drawer.dart';
-import 'package:bizkoala_mobileapp/database/database.dart';
+import 'package:bizkoala_mobileapp/database/helper/quotation_helper.dart';
 import 'package:bizkoala_mobileapp/database/model/quotation.dart';
-import 'package:flutter/material.dart';
 import 'package:bizkoala_mobileapp/service/app_services.dart';
+import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
 final appService = AppService();
@@ -20,10 +20,11 @@ class _MyQuotationsState extends State<MyQuotations> {
   bool _duplicateCustomerDetails = true;
   bool _duplicateItems = true;
 
-  getNewQuoteTitle() {
+  newQuoteDialogBox() async {
     var alertDialog = AlertDialog(
       title: Center(child: Text('New Quotation Title')),
       content: TextField(
+        autofocus: true,
         controller: newTitleController,
         textAlign: TextAlign.center,
         decoration:
@@ -39,6 +40,7 @@ class _MyQuotationsState extends State<MyQuotations> {
             onPressed: () {
               addNewQuotation();
               Navigator.pop(context);
+              newTitleController.clear();
             },
           ),
         ),
@@ -64,16 +66,17 @@ class _MyQuotationsState extends State<MyQuotations> {
           send: 0),
     ];
     Quotation rnd = testQuotations[0];
-    await DBProvider.db.newQuotation(rnd);
+    await QuotationHelper().newQuotation(rnd);
     setState(() {});
   }
 
-  duplicateAlertBox(quotation) async {
+  duplicateDialogBox(quotation) async {
     editTitleController.text = 'Copy - ' + quotation.title;
     var oldQuoteId = quotation.id;
 
     var alertDialog = AlertDialog(
       title: TextField(
+        autofocus: true,
         controller: editTitleController,
         textAlign: TextAlign.center,
         keyboardType: TextInputType.text,
@@ -140,11 +143,11 @@ class _MyQuotationsState extends State<MyQuotations> {
       }
     });
     Navigator.of(context).pop(); // Line 1
-    duplicateAlertBox(quotation);
+    duplicateDialogBox(quotation);
   }
 
   duplicateQuotation(oldQuoteId, newTitle, customerDetails, itemDetails) async {
-    var oldQuotation = await DBProvider.db.getQuotation(oldQuoteId);
+    var oldQuotation = await QuotationHelper().getQuotation(oldQuoteId);
     int customerId;
 
     customerDetails == true
@@ -162,13 +165,27 @@ class _MyQuotationsState extends State<MyQuotations> {
         customerId: customerId,
         send: 0);
     Quotation rnd = newQuote;
-    await DBProvider.db.newQuotation(rnd);
+    await QuotationHelper().newQuotation(rnd);
     setState(() {});
     Navigator.pop(context);
     showWebColoredToast("Quotation duplicated successfully.", 'success');
   }
 
-  deleteQuotation(id) async {
+  deleteQuotation(id, title) async {
+    var text = RichText(
+      textAlign: TextAlign.center,
+      text: TextSpan(
+        style: TextStyle(
+          fontSize: 14.0,
+          color: Colors.black,
+        ),
+        children: <TextSpan>[
+          TextSpan(text: 'This will permanently delete the '),
+          TextSpan(text: title, style: TextStyle(fontWeight: FontWeight.bold)),
+        ],
+      ),
+    );
+
     showDialog(
         context: context,
         builder: (_) => AlertDialog(
@@ -177,7 +194,7 @@ class _MyQuotationsState extends State<MyQuotations> {
                 textAlign: TextAlign.center,
               ),
               content: Text(
-                'This will permanently delete this record !.',
+                'This will permanently delete the ' + title.toString() + ' !.',
                 textAlign: TextAlign.center,
                 style: TextStyle(fontSize: 14.0),
               ),
@@ -188,7 +205,7 @@ class _MyQuotationsState extends State<MyQuotations> {
                     padding: EdgeInsets.all(8.0),
                     splashColor: Colors.blueAccent,
                     onPressed: () {
-                      DBProvider.db.deleteQuotation(id);
+                      QuotationHelper().deleteQuotation(id);
                       setState(() {});
                       Navigator.pop(context);
                     },
@@ -232,9 +249,9 @@ class _MyQuotationsState extends State<MyQuotations> {
         ],
       ),
       body: FutureBuilder(
-        future: DBProvider.db.getAllQuotations(),
+        future: QuotationHelper().getAllQuotations(),
         builder: (BuildContext context, snapshot) {
-          if (snapshot.hasData) {
+          if (snapshot.hasData && snapshot.data.length > 0) {
             return ListView.builder(
               itemCount: snapshot.data.length,
               itemBuilder: (BuildContext context, int index) {
@@ -259,7 +276,7 @@ class _MyQuotationsState extends State<MyQuotations> {
                             color: Colors.brown[900],
                           ),
                           onPressed: () {
-                            duplicateAlertBox(quotation);
+                            duplicateDialogBox(quotation);
                           },
                         ),
                       ),
@@ -288,7 +305,7 @@ class _MyQuotationsState extends State<MyQuotations> {
                           ),
                           onPressed: () {
                             print('Delete Quotation #' + quoteId.toString());
-                            deleteQuotation(quoteId);
+                            deleteQuotation(quoteId, quotation.title);
                           },
                         ),
                       ),
@@ -319,18 +336,24 @@ class _MyQuotationsState extends State<MyQuotations> {
               },
             );
           } else {
-            return Center(child: CircularProgressIndicator());
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[Text("No Quotations...")],
+              ),
+            );
           }
         },
       ),
-      floatingActionButton: FloatingActionButton(
+      floatingActionButton: FloatingActionButton.extended(
         elevation: 4.0,
-        child: Icon(Icons.add),
+        icon: Icon(Icons.add),
+        label: Text("Add New Quotation"),
         onPressed: () async {
-          getNewQuoteTitle();
+          newQuoteDialogBox();
         },
       ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       drawer: MyDrawer(widget.title),
     );
   }
