@@ -66,7 +66,7 @@ class _MyQuotationsState extends State<MyQuotations> {
           send: 0),
     ];
     Quotation rnd = testQuotations[0];
-    await QuotationHelper().newQuotation(rnd);
+    await QuotationHelper().addNew(rnd);
     setState(() {});
   }
 
@@ -147,7 +147,7 @@ class _MyQuotationsState extends State<MyQuotations> {
   }
 
   duplicateQuotation(oldQuoteId, newTitle, customerDetails, itemDetails) async {
-    var oldQuotation = await QuotationHelper().getQuotation(oldQuoteId);
+    var oldQuotation = await QuotationHelper().getOne(oldQuoteId);
     int customerId;
 
     customerDetails == true
@@ -165,7 +165,7 @@ class _MyQuotationsState extends State<MyQuotations> {
         customerId: customerId,
         send: 0);
     Quotation rnd = newQuote;
-    await QuotationHelper().newQuotation(rnd);
+    await QuotationHelper().addNew(rnd);
     setState(() {});
     Navigator.pop(context);
     showWebColoredToast("Quotation duplicated successfully.", 'success');
@@ -205,7 +205,7 @@ class _MyQuotationsState extends State<MyQuotations> {
                     padding: EdgeInsets.all(8.0),
                     splashColor: Colors.blueAccent,
                     onPressed: () {
-                      QuotationHelper().deleteQuotation(id);
+                      QuotationHelper().deleteOne(id);
                       setState(() {});
                       Navigator.pop(context);
                     },
@@ -249,7 +249,7 @@ class _MyQuotationsState extends State<MyQuotations> {
         ],
       ),
       body: FutureBuilder(
-        future: QuotationHelper().getAllQuotations(),
+        future: QuotationHelper().getAll(),
         builder: (BuildContext context, snapshot) {
           if (snapshot.hasData && snapshot.data.length > 0) {
             return ListView.builder(

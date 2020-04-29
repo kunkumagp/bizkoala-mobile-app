@@ -9,8 +9,6 @@ class DatabaseHelper {
   static final DatabaseHelper db = DatabaseHelper._();
 
   static const String DB_NAME = 'bizkoala.db';
-  static const String QUOTATION_TABLE = 'quotations';
-  static const String CUSTOMER_TABLE = 'customers';
 
   static Database _database;
 
@@ -31,8 +29,16 @@ class DatabaseHelper {
 
   _onbCreate(Database db, int version) async {
     await db.execute(
-        "CREATE TABLE $QUOTATION_TABLE ('id' INTEGER PRIMARY KEY, 'title' TEXT, 'note' TEXT, 'tax' TEXT, 'date' TEXT, 'customer_id' INTEGER, 'send' INTEGER)");
+        "CREATE TABLE currencies ('id' INTEGER PRIMARY KEY, 'country' TEXT, 'currency' TEXT, 'code' TEXT, 'symbol' TEXT)");
     await db.execute(
-        "CREATE TABLE $CUSTOMER_TABLE ('id' INTEGER PRIMARY KEY,'name' TEXT, 'email' TEXT, 'address' TEXT, 'telephone' TEXT)");
+        "CREATE TABLE categories ('id' INTEGER PRIMARY KEY, 'parent_id' INTEGER, 'name' TEXT, 'label' TEXT, 'details' LONGTEXT)");
+    await db.execute(
+        "CREATE TABLE customers ('id' INTEGER PRIMARY KEY,'name' TEXT, 'email' TEXT, 'address' TEXT, 'telephone' TEXT)");
+    await db.execute(
+        "CREATE TABLE profile ('id' INTEGER PRIMARY KEY, 'systemId' INTEGER, 'currency_id' INTEGER, 'email' TEXT, 'company_name' TEXT, 'address' TEXT, 'telephone' TEXT, 'logo' TEXT)");
+    await db.execute(
+        "CREATE TABLE quotations ('id' INTEGER PRIMARY KEY, 'title' TEXT, 'note' TEXT, 'tax' TEXT, 'date' TEXT, 'customer_id' INTEGER, 'send' INTEGER)");
+    await db.execute(
+        "CREATE TABLE quote_details ('id' INTEGER PRIMARY KEY, 'quote_id' INTEGER, 'item_id' INTEGER, 'price' TEXT, 'quantity' INTEGER)");
   }
 }

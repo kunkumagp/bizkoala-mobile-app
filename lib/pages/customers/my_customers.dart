@@ -1,7 +1,6 @@
 import 'package:bizkoala_mobileapp/component/drawer.dart';
-import 'package:bizkoala_mobileapp/database/database_helper.dart';
 import 'package:bizkoala_mobileapp/database/helper/customer_helper.dart';
-import 'package:bizkoala_mobileapp/database/model/customers.dart';
+import 'package:bizkoala_mobileapp/database/model/customer.dart';
 import 'package:bizkoala_mobileapp/service/app_services.dart';
 import 'package:flutter/material.dart';
 
@@ -102,7 +101,7 @@ class _MyCustomerState extends State<MyCustomers> {
       telephone: newTelephone,
     );
     Customer rnd = newCustomers;
-    await CustomerHelper().newCustomer(rnd);
+    await CustomerHelper().addNew(rnd);
     setState(() {});
   }
 
@@ -113,7 +112,7 @@ class _MyCustomerState extends State<MyCustomers> {
         title: Text(widget.title),
       ),
       body: FutureBuilder(
-        future: CustomerHelper().getAllCustomers(),
+        future: CustomerHelper().getAll(),
         builder: (BuildContext context, snapshot) {
           if (snapshot.hasData && snapshot.data.length > 0) {
             return ListView.builder(

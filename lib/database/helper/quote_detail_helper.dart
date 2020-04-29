@@ -1,38 +1,35 @@
-import 'package:bizkoala_mobileapp/database/model/quotation.dart';
+import 'package:bizkoala_mobileapp/database/model/quote_detail.dart';
 import 'package:bizkoala_mobileapp/database/database_helper.dart';
 
-class QuotationHelper {
+class QuoteDetailHelper {
   final DatabaseHelper db = DatabaseHelper.db;
-  static const String TABLE = 'quotations';
+  static const String TABLE = 'quote_details';
 
-  addNew(Quotation newQuotation) async {
+  // QuoteDetail section
+  addNew(QuoteDetail newQuoteDetail) async {
     final db = await DatabaseHelper.db.database;
-    var res = await db.insert(TABLE, newQuotation.toJson());
-    // var res = await db.rawInsert(
-    //     "INSERT Into quotations (title, send)"
-    //     " VALUES (?,?)",
-    //     [newQuotation.title, newQuotation.send.toString()]);
+    var res = await db.insert(TABLE, newQuoteDetail.toJson());
     return res;
   }
 
   getAll() async {
     final db = await DatabaseHelper.db.database;
     var res = await db.query(TABLE, orderBy: 'id DESC');
-    List<Quotation> list =
-        res.isNotEmpty ? res.map((q) => Quotation.fromJson(q)).toList() : [];
+    List<QuoteDetail> list =
+        res.isNotEmpty ? res.map((q) => QuoteDetail.fromJson(q)).toList() : [];
     return list;
   }
 
   getOne(int id) async {
     final db = await DatabaseHelper.db.database;
     var res = await db.query(TABLE, where: 'id = ?', whereArgs: [id]);
-    return res.isNotEmpty ? Quotation.fromJson(res.first) : null;
+    return res.isNotEmpty ? QuoteDetail.fromJson(res.first) : null;
   }
 
-  updateOne(Quotation quotation) async {
+  updateOne(QuoteDetail quoteDetail) async {
     final db = await DatabaseHelper.db.database;
-    var res = await db.update(TABLE, quotation.toJson(),
-        where: 'id = ?', whereArgs: [quotation.id]);
+    var res = await db.update(TABLE, quoteDetail.toJson(),
+        where: 'id = ?', whereArgs: [quoteDetail.id]);
     return res;
   }
 
@@ -45,4 +42,5 @@ class QuotationHelper {
     final db = await DatabaseHelper.db.database;
     db.delete(TABLE, where: 'id = ?', whereArgs: [id]);
   }
+  // End QuoteDetail section
 }
