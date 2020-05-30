@@ -1,3 +1,4 @@
+import 'package:bizkoala_mobileapp/pages/my_settings.dart';
 import 'package:bizkoala_mobileapp/routes.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -14,7 +15,8 @@ class MyApp extends StatelessWidget {
       child: MaterialApp(
         title: pageTitle,
         theme: ThemeData(primarySwatch: Colors.green),
-        routes: routes,
+        initialRoute: '/',
+        onGenerateRoute: RouteGenerator.generateRoute,
       ),
       providers: <SingleChildWidget>[
         ChangeNotifierProvider.value(

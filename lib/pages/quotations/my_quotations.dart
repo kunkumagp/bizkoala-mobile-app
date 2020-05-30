@@ -304,7 +304,6 @@ class _MyQuotationsState extends State<MyQuotations> {
                             color: Colors.brown[900],
                           ),
                           onPressed: () {
-                            print('Delete Quotation #' + quoteId.toString());
                             deleteQuotation(quoteId, quotation.title);
                           },
                         ),
@@ -325,12 +324,15 @@ class _MyQuotationsState extends State<MyQuotations> {
                     ],
                   ),
                   onTap: () {
-                    print('Edit Quotation #' + quoteId.toString());
-                    Navigator.pushNamed(context, '/update-quotation');
+                    Navigator.pushNamed(context, '/quotation-details',
+                        arguments: {
+                          'id': quoteId,
+                          'title': quotation.title,
+                        });
                   },
                   title: Text(
                     quotation.title,
-                    style: new TextStyle(fontWeight: FontWeight.normal),
+                    style: TextStyle(fontWeight: FontWeight.normal),
                   ),
                 );
               },

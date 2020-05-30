@@ -15,8 +15,7 @@ class ItemHelper {
   getAll() async {
     final db = await DatabaseHelper.db.database;
     var res = await db.query(TABLE, orderBy: 'id DESC');
-    List<Item> list =
-        res.isNotEmpty ? res.map((q) => Item.fromJson(q)).toList() : [];
+    var list = res.isNotEmpty ? res.map((q) => Item.fromJson(q)).toList() : [];
     return list;
   }
 

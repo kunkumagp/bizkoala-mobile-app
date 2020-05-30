@@ -18,7 +18,7 @@ class QuotationHelper {
   getAll() async {
     final db = await DatabaseHelper.db.database;
     var res = await db.query(TABLE, orderBy: 'id DESC');
-    List<Quotation> list =
+    var list =
         res.isNotEmpty ? res.map((q) => Quotation.fromJson(q)).toList() : [];
     return list;
   }
