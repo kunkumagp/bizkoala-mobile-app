@@ -1,5 +1,6 @@
 import 'package:bizkoala_mobileapp/database/model/category.dart';
 import 'package:bizkoala_mobileapp/database/database_helper.dart';
+import 'package:sqflite/sqflite.dart';
 
 class CategoryHelper {
   final DatabaseHelper db = DatabaseHelper.db;
@@ -18,6 +19,13 @@ class CategoryHelper {
     List<Category> list =
         res.isNotEmpty ? res.map((q) => Category.fromJson(q)).toList() : [];
     return list;
+  }
+
+  categoryCount() async {
+    final db = await DatabaseHelper.db.database;
+    var x = await db.rawQuery('SELECT COUNT (*) from $TABLE');
+    int count = Sqflite.firstIntValue(x);
+    return count;
   }
 
   getOne(int id) async {

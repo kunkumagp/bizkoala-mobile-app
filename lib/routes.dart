@@ -2,6 +2,7 @@ import 'package:bizkoala_mobileapp/pages/auth/login.dart';
 import 'package:bizkoala_mobileapp/pages/auth/register.dart';
 import 'package:bizkoala_mobileapp/pages/quotations/my_quotations.dart';
 import 'package:bizkoala_mobileapp/pages/quotations/quotation_details.dart';
+import 'package:bizkoala_mobileapp/pages/quotations/add_quotation_item.dart';
 import 'package:flutter/material.dart';
 
 class RouteGenerator {
@@ -25,6 +26,16 @@ class RouteGenerator {
         if (args is Object) {
           return MaterialPageRoute(
               builder: (_) => QuotationDetails(
+                    data: args,
+                  ));
+        }
+
+        return _errorRoute();
+
+      case '/add-quotation-items':
+        if (args is Object) {
+          return MaterialPageRoute(
+              builder: (_) => AddQuotationItems(
                     data: args,
                   ));
         }

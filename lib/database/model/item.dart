@@ -44,6 +44,6 @@ class Item {
         "name": name == null ? null : name,
         "price": price == null ? null : price,
         "details": details == null ? null : details,
-        "is_activy": isActivy == null ? null : isActivy,
+        "is_active": isActivy == null ? null : isActivy,
       };
 }

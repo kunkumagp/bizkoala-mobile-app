@@ -43,7 +43,14 @@ class _QuotationDetailState extends State<QuotationDetails> {
                     textColor: Colors.white,
                     padding: EdgeInsets.all(8.0),
                     onPressed: () {
-                      print("Add New Item");
+                      AppService().onLoading(context);
+                      Future.delayed(Duration(seconds: 1), () {
+                        Navigator.pop(context); //pop dialog
+                        Navigator.pushNamed(context, '/add-quotation-items',
+                            arguments: {
+                              'id': quotationId,
+                            });
+                      });
                     },
                     child: Text('Add New Item'),
                   ),
@@ -122,26 +129,23 @@ class ItemList extends StatelessWidget {
                   ),
                 ),
               ],
-              rows:
-                  list // Loops through dataColumnText, each iteration assigning the value to element
-                      .map(
-                        ((element) => DataRow(
-                              cells: <DataCell>[
-                                DataCell(Container(
-                                    width: 130,
-                                    child: Text(
-                                        "Product Name"))), //Extracting from Map element the value
-                                DataCell(Text("Qty")),
-                                DataCell(
-                                  Container(
-                                    alignment: Alignment.centerRight,
-                                    child: Text("Line Total"),
-                                  ),
-                                ),
-                              ],
-                            )),
-                      )
-                      .toList(),
+              rows: list
+                  .map(
+                    ((element) => DataRow(
+                          cells: <DataCell>[
+                            DataCell(Container(
+                                width: 130, child: Text("Product Name"))),
+                            DataCell(Text("Qty")),
+                            DataCell(
+                              Container(
+                                alignment: Alignment.centerRight,
+                                child: Text("Line Total"),
+                              ),
+                            ),
+                          ],
+                        )),
+                  )
+                  .toList(),
             );
           } else {
             return Center(

@@ -35,7 +35,7 @@ class DatabaseHelper {
     await db.execute(
         "CREATE TABLE customers ('id' INTEGER PRIMARY KEY,'name' TEXT, 'email' TEXT, 'address' TEXT, 'telephone' TEXT)");
     await db.execute(
-        "CREATE TABLE items ('id' INTEGER PRIMARY KEY, 'categoryId' INTEGER, 'code' TEXT, 'name' TEXT, 'price' TEXT, 'details' TEXT, 'isActivy' TEXT)");
+        "CREATE TABLE items ('id' INTEGER PRIMARY KEY, 'category_id' INTEGER, 'code' TEXT, 'name' TEXT, 'price' TEXT, 'details' TEXT, 'is_active' TEXT)");
     await db.execute(
         "CREATE TABLE profile ('id' INTEGER PRIMARY KEY, 'systemId' INTEGER, 'currency_id' INTEGER, 'email' TEXT, 'company_name' TEXT, 'address' TEXT, 'telephone' TEXT, 'logo' TEXT)");
     await db.execute(
