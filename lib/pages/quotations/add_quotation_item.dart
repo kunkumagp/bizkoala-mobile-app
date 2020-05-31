@@ -8,7 +8,8 @@ import 'package:bizkoala_mobileapp/database/model/category.dart';
 
 final appService = AppService();
 List<DropdownMenuItem<String>> categoryList = [];
-List<DropdownMenuItem<String>> itemList = [];
+List itemList = [];
+
 String selectedCategory;
 
 class AddQuotationItems extends StatefulWidget {
@@ -326,7 +327,6 @@ class _AddQuotationItemState extends State<AddQuotationItems> {
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: <Widget>[
                             CategoryItems(),
-                            Text("Categories"),
                           ],
                         ),
                       ),
@@ -399,14 +399,10 @@ class _CategoryListState extends State<CategoryList> {
   }
 }
 
-class CategoryItems extends StatefulWidget {
-  @override
-  _CategoryItemsState createState() => _CategoryItemsState();
-}
-
-class _CategoryItemsState extends State<CategoryItems> {
+class CategoryItems extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    clearItemList();
     return FutureBuilder(
       future: CategoryHelper().getAll(),
       builder: (BuildContext context, snapshot) {
@@ -433,7 +429,46 @@ class _CategoryItemsState extends State<CategoryItems> {
                           trailing: Icon(Icons.arrow_drop_down),
                           onExpansionChanged: (value) {},
                           children: <Widget>[
-                            ItemsByCategory(category.id),
+                            // ItemsByCategory(category.id),
+                            FutureBuilder(
+                              future:
+                                  ItemHelper().getItemByCategoryId(category.id),
+                              builder: (BuildContext context, snapshot) {
+                                if (snapshot.hasData &&
+                                    snapshot.data.length > 0) {
+                                  return ListView.builder(
+                                    scrollDirection: Axis.vertical,
+                                    shrinkWrap: true,
+                                    itemCount: snapshot.data.length,
+                                    itemBuilder: (context, index) {
+                                      Item item = snapshot.data[index];
+                                      TextEditingController itemQnt =
+                                          TextEditingController(text: '0');
+                                      return Table(
+                                        columnWidths: {
+                                          0: FractionColumnWidth(.2)
+                                        },
+                                        children: [
+                                          TableRow(
+                                            children: itemRow(item, itemQnt),
+                                          ),
+                                        ],
+                                      );
+                                    },
+                                  );
+                                } else {
+                                  return Center(
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: <Widget>[
+                                        Text("No Product or services...")
+                                      ],
+                                    ),
+                                  );
+                                }
+                              },
+                            ),
                           ],
                         );
                       },
@@ -456,51 +491,13 @@ class _CategoryItemsState extends State<CategoryItems> {
   }
 }
 
-class ItemsByCategory extends StatelessWidget {
-  int categoryId;
-  ItemsByCategory(this.categoryId);
-
-  @override
-  Widget build(context) {
-    return FutureBuilder(
-      future: ItemHelper().getItemByCategoryId(categoryId),
-      builder: (BuildContext context, snapshot) {
-        if (snapshot.hasData && snapshot.data.length > 0) {
-          return ListView.builder(
-            scrollDirection: Axis.vertical,
-            shrinkWrap: true,
-            itemCount: snapshot.data.length,
-            itemBuilder: (context, index) {
-              Item item = snapshot.data[index];
-              TextEditingController itemQnt = TextEditingController(text: '0');
-              return Table(
-                columnWidths: {0: FractionColumnWidth(.2)},
-                children: [
-                  TableRow(
-                    children: itemRow(item, itemQnt),
-                  ),
-                ],
-              );
-            },
-          );
-        } else {
-          return Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[Text("No Product or services...")],
-            ),
-          );
-        }
-      },
-    );
-  }
-}
-
 class MostUsedItems extends StatelessWidget {
   int quoteId;
   MostUsedItems(this.quoteId);
+
   @override
   Widget build(context) {
+    clearItemList();
     return FutureBuilder(
       future: ItemHelper().getAll(),
       builder: (BuildContext context, snapshot) {
@@ -560,6 +557,7 @@ itemRow(item, itemQnt) {
             int val = int.parse(itemQnt.text);
             if (val > 0) {
               val = val - 1;
+              saveItemOnLocal(item, val);
             }
             itemQnt.text = val.toString();
           }),
@@ -590,10 +588,34 @@ itemRow(item, itemQnt) {
           onPressed: () {
             int val = int.parse(itemQnt.text);
             val = val + 1;
+            if (val > 0) {
+              saveItemOnLocal(item, val);
+            }
             itemQnt.text = val.toString();
           }),
     ),
   ];
 
   return x;
+}
+
+saveItemOnLocal(item, itemQnt) {
+  var productMap = {
+    'itemId': item.id,
+    'price': item.price,
+    'qnt': itemQnt,
+  };
+
+  if (itemList.length > 0) {
+    for (var i = 0; i < itemList.length; i++) {
+      if (itemList[i]['itemId'] == item.id) {
+        itemList.removeAt(i); // true
+      }
+    }
+  }
+  itemList.add(productMap);
+}
+
+clearItemList() {
+  itemList.removeRange(0, itemList.length);
 }
