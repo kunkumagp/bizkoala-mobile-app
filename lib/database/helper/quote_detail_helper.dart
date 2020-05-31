@@ -13,22 +13,18 @@ class QuoteDetailHelper {
     return res;
   }
 
-  // getAll() async {
-  //   final db = await DatabaseHelper.db.database;
-  //   var res = await db.query(TABLE, orderBy: 'id DESC');
-  //   // var res = await db.rawQuery(
-  //   //     'SELECT * FROM $TABLE INNER JOIN items ON basket.id = items.basketId');
-  //   var list =
-  //       res.isNotEmpty ? res.map((q) => QuoteDetail.fromJson(q)).toList() : [];
-  //   return list;
-  // }
+  getAll() async {
+    final db = await DatabaseHelper.db.database;
+    var res = await db.query(TABLE, orderBy: 'id DESC');
+    var list =
+        res.isNotEmpty ? res.map((q) => QuoteDetail.fromJson(q)).toList() : [];
+    return list;
+  }
 
   getAllByQuoteId(quoteId) async {
     final db = await DatabaseHelper.db.database;
-    var res = await db.rawQuery(
-        "SELECT * FROM $TABLE INNER JOIN $SECOND_TABLE ON $TABLE.item_id = $SECOND_TABLE.id AND $TABLE.quote_id='" +
-            quoteId +
-            "'");
+    var res =
+        await db.query(TABLE, where: 'quote_id = ?', whereArgs: [quoteId]);
     var list =
         res.isNotEmpty ? res.map((q) => QuoteDetail.fromJson(q)).toList() : [];
     return list;

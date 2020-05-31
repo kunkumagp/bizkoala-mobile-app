@@ -5,6 +5,8 @@ import 'package:bizkoala_mobileapp/database/helper/item_helper.dart';
 import 'package:bizkoala_mobileapp/database/model/item.dart';
 import 'package:bizkoala_mobileapp/database/helper/category_helper.dart';
 import 'package:bizkoala_mobileapp/database/model/category.dart';
+import 'package:bizkoala_mobileapp/database/helper/quote_detail_helper.dart';
+import 'package:bizkoala_mobileapp/database/model/quote_detail.dart';
 
 final appService = AppService();
 List<DropdownMenuItem<String>> categoryList = [];
@@ -268,9 +270,29 @@ class _AddQuotationItemState extends State<AddQuotationItems> {
         });
   }
 
+  addItemToQuotation() async {
+    if (itemList.length > 0) {
+      for (var i = 0; i < itemList.length; i++) {
+        var item = itemList[i];
+        List<QuoteDetail> newQuoteItem = [
+          QuoteDetail(
+            quoteId: widget.data['id'],
+            itemId: item['itemId'],
+            price: item['price'],
+            quantity: item['qnt'],
+          ),
+        ];
+        QuoteDetail rnd = newQuoteItem[0];
+        await QuoteDetailHelper().addNew(rnd);
+        setState(() {});
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final quotationId = widget.data['id'];
+    final quotationTitle = widget.data['title'];
 
     return DefaultTabController(
       length: 2,
@@ -287,7 +309,17 @@ class _AddQuotationItemState extends State<AddQuotationItems> {
                     borderRadius: new BorderRadius.circular(5.0),
                     side: BorderSide(color: Colors.white)),
                 onPressed: () {
-                  print(itemList);
+                  // print(itemList);
+                  addItemToQuotation();
+                  AppService().onLoading(context);
+                  Future.delayed(Duration(seconds: 3), () {
+                    Navigator.pop(context); //pop dialog
+                    Navigator.pushNamed(context, '/quotation-details',
+                        arguments: {
+                          'id': quotationId,
+                          'title': quotationTitle,
+                        });
+                  });
                 },
                 color: Colors.white,
                 textColor: Colors.green,
@@ -595,7 +627,6 @@ itemRow(item, itemQnt) {
           }),
     ),
   ];
-
   return x;
 }
 
