@@ -19,6 +19,14 @@ class ItemHelper {
     return list;
   }
 
+  getItemByCategoryId(categoryId) async {
+    final db = await DatabaseHelper.db.database;
+    var res = await db
+        .query(TABLE, where: 'category_id = ?', whereArgs: [categoryId]);
+    var list = res.isNotEmpty ? res.map((q) => Item.fromJson(q)).toList() : [];
+    return list;
+  }
+
   getOne(int id) async {
     final db = await DatabaseHelper.db.database;
     var res = await db.query(TABLE, where: 'id = ?', whereArgs: [id]);

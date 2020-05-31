@@ -8,6 +8,7 @@ import 'package:bizkoala_mobileapp/database/model/category.dart';
 
 final appService = AppService();
 List<DropdownMenuItem<String>> categoryList = [];
+List<DropdownMenuItem<String>> itemList = [];
 String selectedCategory;
 
 class AddQuotationItems extends StatefulWidget {
@@ -285,9 +286,7 @@ class _AddQuotationItemState extends State<AddQuotationItems> {
                     borderRadius: new BorderRadius.circular(5.0),
                     side: BorderSide(color: Colors.white)),
                 onPressed: () {
-                  appService.isLoggedIn().then((value) {
-                    print(value);
-                  });
+                  print(itemList);
                 },
                 color: Colors.white,
                 textColor: Colors.green,
@@ -310,25 +309,29 @@ class _AddQuotationItemState extends State<AddQuotationItems> {
               ),
               Expanded(
                 child: Container(
-                  child: TabBarView(children: [
-                    Container(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: <Widget>[
-                          ItemList(quotationId),
-                        ],
-                      ),
-                    ),
-                    Container(
+                  child: TabBarView(
+                    children: [
+                      Container(
                         child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: <Widget>[
-                        Text("Categories"),
-                      ],
-                    )),
-                  ]),
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: <Widget>[
+                            MostUsedItems(quotationId),
+                          ],
+                        ),
+                      ),
+                      Container(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: <Widget>[
+                            CategoryItems(),
+                            Text("Categories"),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               )
             ],
@@ -396,9 +399,106 @@ class _CategoryListState extends State<CategoryList> {
   }
 }
 
-class ItemList extends StatelessWidget {
+class CategoryItems extends StatefulWidget {
+  @override
+  _CategoryItemsState createState() => _CategoryItemsState();
+}
+
+class _CategoryItemsState extends State<CategoryItems> {
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder(
+      future: CategoryHelper().getAll(),
+      builder: (BuildContext context, snapshot) {
+        if (snapshot.hasData && snapshot.data.length > 0) {
+          categoryList = [];
+
+          return Expanded(
+            child: SingleChildScrollView(
+              child: Container(
+                child: Column(
+                  children: <Widget>[
+                    ListView.builder(
+                      scrollDirection: Axis.vertical,
+                      shrinkWrap: true,
+                      itemCount: snapshot.data.length,
+                      itemBuilder: (context, index) {
+                        Icon icon = Icon(Icons.arrow_drop_down);
+                        Category category = snapshot.data[index];
+                        return ExpansionTile(
+                          title: Container(
+                            width: double.infinity,
+                            child: Text(category.name),
+                          ),
+                          trailing: Icon(Icons.arrow_drop_down),
+                          onExpansionChanged: (value) {},
+                          children: <Widget>[
+                            ItemsByCategory(category.id),
+                          ],
+                        );
+                      },
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          );
+        } else {
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[Text("No Categories...")],
+            ),
+          );
+        }
+      },
+    );
+  }
+}
+
+class ItemsByCategory extends StatelessWidget {
+  int categoryId;
+  ItemsByCategory(this.categoryId);
+
+  @override
+  Widget build(context) {
+    return FutureBuilder(
+      future: ItemHelper().getItemByCategoryId(categoryId),
+      builder: (BuildContext context, snapshot) {
+        if (snapshot.hasData && snapshot.data.length > 0) {
+          return ListView.builder(
+            scrollDirection: Axis.vertical,
+            shrinkWrap: true,
+            itemCount: snapshot.data.length,
+            itemBuilder: (context, index) {
+              Item item = snapshot.data[index];
+              TextEditingController itemQnt = TextEditingController(text: '0');
+              return Table(
+                columnWidths: {0: FractionColumnWidth(.2)},
+                children: [
+                  TableRow(
+                    children: itemRow(item, itemQnt),
+                  ),
+                ],
+              );
+            },
+          );
+        } else {
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[Text("No Product or services...")],
+            ),
+          );
+        }
+      },
+    );
+  }
+}
+
+class MostUsedItems extends StatelessWidget {
   int quoteId;
-  ItemList(this.quoteId);
+  MostUsedItems(this.quoteId);
   @override
   Widget build(context) {
     return FutureBuilder(
@@ -418,64 +518,7 @@ class ItemList extends StatelessWidget {
                 return Table(
                   columnWidths: {0: FractionColumnWidth(.2)},
                   children: [
-                    TableRow(children: [
-                      Container(
-                        padding: EdgeInsets.only(
-                            left: 15.0, right: 1.0, top: 20.0, bottom: 20.0),
-                        alignment: Alignment.centerLeft,
-                        child: Text(item.name,
-                            style: TextStyle(fontWeight: FontWeight.bold)),
-                      ),
-                      Container(
-                        padding: EdgeInsets.only(
-                            left: 5.0, right: 5.0, top: 20.0, bottom: 20.0),
-                        alignment: Alignment.centerRight,
-                        child: Text(item.price),
-                      ),
-                      Container(
-                        alignment: Alignment.centerRight,
-                        child: IconButton(
-                            icon: Icon(Icons.remove_circle_outline),
-                            onPressed: () {
-                              int val = int.parse(itemQnt.text);
-                              if (val > 0) {
-                                val = val - 1;
-                                itemQnt.text = val.toString();
-                              }
-                            }),
-                      ),
-                      Container(
-                        padding:
-                            EdgeInsets.only(left: 5.0, right: 5.0, bottom: 2.0),
-                        alignment: Alignment.centerRight,
-                        child: TextField(
-                          controller: itemQnt,
-                          textAlign: TextAlign.center,
-                          keyboardType: TextInputType.number,
-                          decoration: InputDecoration(
-                            contentPadding: EdgeInsets.all(1),
-                            focusedBorder: OutlineInputBorder(
-                              borderSide: BorderSide(
-                                  color: Colors.blueAccent, width: 1.0),
-                            ),
-                            enabledBorder: OutlineInputBorder(
-                              borderSide:
-                                  BorderSide(color: Colors.green, width: 1.0),
-                            ),
-                          ),
-                        ),
-                      ),
-                      Container(
-                        alignment: Alignment.centerLeft,
-                        child: IconButton(
-                            icon: Icon(Icons.add_circle_outline),
-                            onPressed: () {
-                              int val = int.parse(itemQnt.text);
-                              val = val + 1;
-                              itemQnt.text = val.toString();
-                            }),
-                      ),
-                    ]),
+                    TableRow(children: itemRow(item, itemQnt)),
                   ],
                 );
               },
@@ -492,4 +535,65 @@ class ItemList extends StatelessWidget {
       },
     );
   }
+}
+
+itemRow(item, itemQnt) {
+  var x = [
+    Container(
+      padding: EdgeInsets.only(left: 25.0, top: 20.0, bottom: 20.0),
+      alignment: Alignment.centerLeft,
+      child: Text(
+        item.name,
+        style: TextStyle(fontWeight: FontWeight.bold),
+      ),
+    ),
+    Container(
+      padding: EdgeInsets.only(top: 20.0, bottom: 20.0),
+      alignment: Alignment.centerRight,
+      child: Text(item.price),
+    ),
+    Container(
+      alignment: Alignment.centerRight,
+      child: IconButton(
+          icon: Icon(Icons.remove_circle_outline),
+          onPressed: () {
+            int val = int.parse(itemQnt.text);
+            if (val > 0) {
+              val = val - 1;
+            }
+            itemQnt.text = val.toString();
+          }),
+    ),
+    Container(
+      padding: EdgeInsets.only(top: 5.0),
+      height: 40.0,
+      alignment: Alignment.centerRight,
+      child: TextField(
+        controller: itemQnt,
+        textAlign: TextAlign.center,
+        keyboardType: TextInputType.number,
+        decoration: InputDecoration(
+          contentPadding: EdgeInsets.all(1),
+          focusedBorder: OutlineInputBorder(
+            borderSide: BorderSide(color: Colors.blueAccent, width: 1.0),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderSide: BorderSide(color: Colors.green, width: 1.0),
+          ),
+        ),
+      ),
+    ),
+    Container(
+      alignment: Alignment.centerLeft,
+      child: IconButton(
+          icon: Icon(Icons.add_circle_outline),
+          onPressed: () {
+            int val = int.parse(itemQnt.text);
+            val = val + 1;
+            itemQnt.text = val.toString();
+          }),
+    ),
+  ];
+
+  return x;
 }
